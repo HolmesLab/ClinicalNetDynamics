@@ -12,7 +12,7 @@ To investigate brain network dynamics linked with dimensionally-based symptom pr
 * NMF_Cocuzza.py: python functions to 
 
 **Outside resources relevant to manuscript:**
-* [Cortical parcellation GitHub]([url](https://github.com/ThomasYeoLab/CBIG/tree/master/stable_projects/brain_parcellation/Yan2023_homotopic)) (note: 400 parcel resolution used in mansucript), [Yan et al., 2023, NeuroImage]([url](https://www.sciencedirect.com/science/article/pii/S1053811923001568?via%3Dihub))
+* [Cortical parcellation GitHub]((https://github.com/ThomasYeoLab/CBIG/tree/master/stable_projects/brain_parcellation/Yan2023_homotopic)) (note: 400 parcel resolution used in mansucript), [Yan et al., 2023, NeuroImage]([url](https://www.sciencedirect.com/science/article/pii/S1053811923001568?via%3Dihub))
 * Subcortical atlas (S2 resolution used in manuscript), Tian et al., 2021:
 * Cerebellum identification (see manuscript for spatial autocorrelation regression), Buckner et al., 2011:
 * Transdiagnostic Connectome Project data:
