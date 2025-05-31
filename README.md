@@ -8,8 +8,11 @@ To investigate brain network dynamics linked with dimensionally-based symptom pr
 **Corresponding author email:** carrisacocuzza@gmail.com
 
 **Repository contents:**
-* Note that all scripts below include detailed annotations throughout and are prefaced with notes on required toolboxes, versions, etc. 
-* NMF_Cocuzza.py: python functions to 
+* Note that all scripts below include detailed annotations throughout and are prefaced with notes on required toolboxes, versions, etc.; other contextual details may be found in the Methods section of the manuscript
+* NMF_Cocuzza.py: python functions to implement non-negative matrix factorization (approach used to quantify brain network reconfiguration dynamics)
+* Fingerprints_Cocuzza.py: python functions relevant to our symptom profiling/fingerprinting pipeline (note: RStudio used in select steps; notes are included where appropriate)
+* Data_Splitting_Cocuzza.py: python script on how we split data into train/test/validation to avoid data leakage (see manuscript Methods)
+* Heatmap_NetColors_Cocuzza.py: python function to visualize network color labels on x/y axes of functional connectivity matrices 
 
 **Outside resources relevant to manuscript:**
 * [Cortical parcellation repository](https://github.com/ThomasYeoLab/CBIG/tree/master/stable_projects/brain_parcellation/Yan2023_homotopic) (note: 400 parcel resolution used in mansucript as well as 17 networks per Yeo et al. 2011), [Yan et al., 2023, NeuroImage](https://www.sciencedirect.com/science/article/pii/S1053811923001568?via%3Dihub)
