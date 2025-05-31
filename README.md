@@ -12,8 +12,8 @@ To investigate brain network dynamics linked with dimensionally-based symptom pr
 * NMF_Cocuzza.py: python functions to 
 
 **Outside resources relevant to manuscript:**
-* [Cortical Parcellation GitHub Repo](https://github.com/ThomasYeoLab/CBIG/tree/master/stable_projects/brain_parcellation/Yan2023_homotopic) (note: 400 parcel resolution used in mansucript), [Yan et al., 2023, NeuroImage]([url](https://www.sciencedirect.com/science/article/pii/S1053811923001568?via%3Dihub))
-* Subcortical atlas (S2 resolution used in manuscript), Tian et al., 2021:
+* [Cortical parcellation repository](https://github.com/ThomasYeoLab/CBIG/tree/master/stable_projects/brain_parcellation/Yan2023_homotopic) (note: 400 parcel resolution used in mansucript), [Yan et al., 2023, NeuroImage](https://www.sciencedirect.com/science/article/pii/S1053811923001568?via%3Dihub)
+* [Subcortical atlas repository](https://github.com/yetianmed/subcortex?tab=readme-ov-file) (note: scale II used in manuscript), [Tian et al., 2021, Nature Neuroscience](https://www.nature.com/articles/s41593-020-00711-6.epdf?sharing_token=Fzk9fg_oTs49l2_4GcFHvtRgN0jAjWel9jnR3ZoTv0OcoEh_rWSSGTYcOuTVFJlvyoz7cKiJgYmHRlYIGzAnNt5tMyMZIXn3xdgdMC_wzDAONIDh5m0cUiLGzNChnEK_AHqVJl2Qrno8-hzk8CanTnXjGX3rRfZX3WXgTLew1oE%3D)
 * Cerebellum identification (see manuscript for spatial autocorrelation regression), Buckner et al., 2011:
 * Transdiagnostic Connectome Project data:
 * Transdiagnostic Connectome Project code (including the pre-processing pipeline used in the present manuscript):
