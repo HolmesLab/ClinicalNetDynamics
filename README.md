@@ -12,10 +12,10 @@ To investigate brain network dynamics linked with dimensionally-based symptom pr
 * NMF_Cocuzza.py: python functions to 
 
 **Outside resources relevant to manuscript:**
-* [Cortical parcellation repository](https://github.com/ThomasYeoLab/CBIG/tree/master/stable_projects/brain_parcellation/Yan2023_homotopic) (note: 400 parcel resolution used in mansucript as well as 17 Networks per Yeo et al. 2011), [Yan et al., 2023, NeuroImage](https://www.sciencedirect.com/science/article/pii/S1053811923001568?via%3Dihub)
+* [Cortical parcellation repository](https://github.com/ThomasYeoLab/CBIG/tree/master/stable_projects/brain_parcellation/Yan2023_homotopic) (note: 400 parcel resolution used in mansucript as well as 17 networks per Yeo et al. 2011), [Yan et al., 2023, NeuroImage](https://www.sciencedirect.com/science/article/pii/S1053811923001568?via%3Dihub)
 * [Subcortical atlas repository](https://github.com/yetianmed/subcortex?tab=readme-ov-file) (note: scale II used in manuscript), [Tian et al., 2021, Nature Neuroscience](https://www.nature.com/articles/s41593-020-00711-6.epdf?sharing_token=Fzk9fg_oTs49l2_4GcFHvtRgN0jAjWel9jnR3ZoTv0OcoEh_rWSSGTYcOuTVFJlvyoz7cKiJgYmHRlYIGzAnNt5tMyMZIXn3xdgdMC_wzDAONIDh5m0cUiLGzNChnEK_AHqVJl2Qrno8-hzk8CanTnXjGX3rRfZX3WXgTLew1oE%3D)
 * [Cerebellum identification repository](https://github.com/DiedrichsenLab/cerebellar_atlases/tree/master/Buckner_2011) (note: see Buckner study for details on spatial autocorrelation regression), [Buckner et al., 2011, Journal of Neurophysiology](https://pubmed.ncbi.nlm.nih.gov/21795627/)
-* Transdiagnostic Connectome Project data:
-* Transdiagnostic Connectome Project code (including the pre-processing pipeline used in the present manuscript):
-* Brain Connectivity Toolbox (select analyses; see network efficiency and participation coefficient):
-* Human Connectome Project Workbench for projecting results onto cortical surfaces (i.e., brain visualizations): 
+* Transdiagnostic Connectome Project data via [OpenNeuro](https://openneuro.org/datasets/ds005237) and [NIMH Data Archive](https://nda.nih.gov/study.html?id=2932)
+* [Transdiagnostic Connectome Project code repository](https://github.com/HolmesLab/TransdiagnosticConnectomeProject) (including resources for the pre-processing pipeline used in the present manuscript)
+* Brain Connectivity Toolbox (used in select analyses; see network efficiency and participation coefficient) for [MATLAB](https://sites.google.com/site/bctnet/) and [Python](https://pypi.org/project/bctpy/)
+* [Human Connectome Project Workbench](https://www.humanconnectome.org/software/connectome-workbench) for projecting results onto cortical surfaces (i.e., brain visualizations)
