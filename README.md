@@ -8,8 +8,8 @@ To investigate brain network dynamics linked with dimensionally-based symptom pr
 *Corresponding author email: carrisacocuzza@gmail.com
 
 Repository contents: 
-**Note that all scripts below include detailed annotations throughout and are prefaced with notes on required toolboxes, versions, etc. 
-**NMF_Cocuzza.py: python functions to 
+* Note that all scripts below include detailed annotations throughout and are prefaced with notes on required toolboxes, versions, etc. 
+* NMF_Cocuzza.py: python functions to 
 
 Outside resources relevant to manuscript: 
 
