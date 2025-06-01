@@ -8,7 +8,7 @@ To investigate brain network dynamics linked with dimensionally-based symptom pr
 **Corresponding author email:** carrisacocuzza@gmail.com
 
 **Repository contents:**
-* Note that all scripts below include detailed annotations throughout and are prefaced with notes on required toolboxes, versions, etc.; other contextual details may be found in the Methods section of the manuscript
+* Note that all scripts below include detailed annotations throughout; other contextual details may be found in the Methods section of the manuscript
   
 * NMF_Cocuzza.py: python functions to implement non-negative matrix factorization (approach used to quantify brain network reconfiguration dynamics)
   
