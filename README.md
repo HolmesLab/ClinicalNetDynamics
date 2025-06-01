@@ -9,9 +9,13 @@ To investigate brain network dynamics linked with dimensionally-based symptom pr
 
 **Repository contents:**
 * Note that all scripts below include detailed annotations throughout and are prefaced with notes on required toolboxes, versions, etc.; other contextual details may be found in the Methods section of the manuscript
+  
 * NMF_Cocuzza.py: python functions to implement non-negative matrix factorization (approach used to quantify brain network reconfiguration dynamics)
+  
 * Fingerprints_Cocuzza.py: python functions relevant to our symptom profiling/fingerprinting pipeline (note: RStudio used in select steps; notes are included where appropriate)
+  
 * Data_Splitting_Cocuzza.py: python script on how we split data into train/test/validation to avoid data leakage (see manuscript Methods)
+  
 * Heatmap_NetColors_Cocuzza.py: python function to visualize network color labels on x/y axes of functional connectivity matrices 
 
 **Outside resources relevant to manuscript:**
