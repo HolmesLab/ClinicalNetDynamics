@@ -4,9 +4,11 @@
 # Khambhati, A. N., Medaglia, J. D., Karuza, E. A., Thompson-Schill, S. L., & Bassett, D. S. (2018). Subgraphs of functional brain networks identify dynamical constraints of cognitive control. PLoS Computational Biology, 14(7), e1006234. https://doi.org/10.1371/journal.pcbi.1006234
 
 '''
-# Example usage: FC data in variable fcAll: 434 regions x 434 regions x 3 runs or states x 100 subjects
+# Example usage: FC data in variable fcAll: 434 regions x 434 regions x 3 runs or states x 100 subjects to be used in train/test
+# And another 30 subjects in fcData_Validation (434 x 434 x 3 x 30)
 # Can copy and paste into jupyter notebook, python script, etc. 
 
+####################################################################################
 import sys
 import numpy as np 
 
@@ -80,7 +82,7 @@ print(f"Across-state average max mantel r (averaged over {nBoots} train/test fol
       f"{np.round(np.nanmax(mantelAvg),4)}. alpha = {alphaSweep[r]}, beta = {betaSweep[c]} ")
 
 
-##########################################
+####################################################################################
 # Test stability of k (number of subgraphs/coefficients) with identified alpha and beta from above 
 # NOTE: you can sweep all 3 together but code needs to be adapted and it will take longer computationally
 
@@ -136,6 +138,21 @@ mantelAvg = np.nanmean(np.nanmean(mantelAll_TestOrig_TestInv_k_All,axis=2),axis=
 r = np.where(mantelAvg==np.nanmax(mantelAvg))[0]
 print(f"Across-state average max mantel r (averaged over {nBoots} train/test folds) = {np.round(np.nanmax(mantelAvg),4)}. k = {subgraphSweep[r]} subgraphs.")
 
+####################################################################################
+# After tuning parameters, run NMF on held-out validation data 
+alphaHere_W = 0.2
+betaLossHere = 1.0
+nSubgraphs = 7 
+nRuns = 3 
+nRegions = 434 
+
+nmfInputArray_Validation = nmfCode.NMF_format_data(fcData_Validation)
+weightedSubgraphs, subgraphExpressions, weightedSubgraphs_NetShape, FC_All_Reconstituted = nmfCode.NMF_validation(nmfInputArray_Validation,
+                                                                                                                  nRuns,
+                                                                                                                  nRegions,
+                                                                                                                  alphaHere_W,
+                                                                                                                  betaLossHere,
+                                                                                                                  nSubgraphs)
 '''
 
 ########################################################################################
@@ -492,3 +509,73 @@ def NMF_subgraph_stability(nmfInputArray_Train,
                                                                                    nSubgraphs=nSubgraphs)
     
     return reconstructionError_Test_k, mantelAll_TestOrig_TestInv_k
+
+########################################################################################
+def NMF_validation(nmfInputArray,
+                   nRuns,
+                   nRegions,
+                   alphaHere_W,
+                   betaLossHere,
+                   nSubgraphs,
+                   l1RatioHere=0,
+                   initHere=None,
+                   solverHere='mu',
+                   tolHere=0.0001,
+                   maxIterHere=600,
+                   randomStateHere=None,
+                   alphaHere_H='same',
+                   verboseHere=0,
+                   shuffleHere=False):
+
+    '''
+    Once alpha, beta, and k parameters are tuned, run NMF on held-out validation set. Can format validation FC data with NMF_format_data() above.
+    
+    INPUTS: 
+        nmfInputArray: output of NMF_format_data(), validation set that was held out. regional pairs x states & training subjects
+        nRuns: number of runs/states in NMF input array (same as in NMF_format_data() and dimension 3 in fcData)
+        nRegions: number of brain regions, or x and y axes of fcData used in NMF_format_data()
+        alphaHere_W: value of alpha; regularization constant 
+        betaLossHere: value of beta; beta divergence to be minimized 
+        nSubgraphs: number of coefficients or k 
+        l1RatioHere: initial tests show >0 overly sparsifies; so this is actually L2 ratio (when set to 0). Default 0
+        initHere: default to None
+        solverHere: may consider other options; note coordinate descent (cd) is sklearn default, but mu (multiplicative) is needed to sweep beta parameter. Default 'mu'
+        tolHere: tolerance of stopping condition. Default 0.0001
+        maxIterHere: iterations before timeout, 200 is sklearn default; I increased it based on warnings printed out --> Default 600
+        randomStateHere: used only with init; or with coordinate descent. Default None
+        alphaHere_H: Default 'same' --> use same alpha as sweeped by CV (for W matrix) for H matrix
+        verboseHere: can set to True (1) if need to debug; Default 0 (False)
+        shuffleHere: Used if you need to randomize coordiante order in solver; Default False 
+
+    OUTPUTS: 
+        weightedSubgraphs: features matrix (basis set) 
+        subgraphExpressions: coefficients matrix (expressions; encoding matrix)
+        weightedSubgraphs_NetShape: reformatting features matrix into k (nSubgraphs) number of region x region matrices (i.e., back into original brain network format)
+        FC_All_Reconstituted: NMF-reconstituted input array 
+    '''
+    
+    nmfModel = sklearn.decomposition.NMF(n_components=nSubgraphs, 
+                                         init=initHere, 
+                                         solver=solverHere, 
+                                         beta_loss=betaLossHere, 
+                                         tol=tolHere, 
+                                         max_iter=maxIterHere, 
+                                         random_state=randomStateHere, 
+                                         alpha_W=alphaHere_W, 
+                                         alpha_H=alphaHere_H, 
+                                         l1_ratio=l1RatioHere, 
+                                         verbose=verboseHere, 
+                                         shuffle=shuffleHere)
+    
+    weightedSubgraphs = nmfModel.fit_transform(nmfInputArray)
+    subgraphExpressions = nmfModel.components_
+    
+    weightedSubgraphs_NetShape = np.zeros((nRegions,nRegions,nSubgraphs))
+    for subGraphNum in range(nSubgraphs):
+        thisGraph_NetShape = np.zeros((nRegions,nRegions))
+        thisGraph_NetShape[np.triu_indices(nRegions,k=1)] = weightedSubgraphs[:,subGraphNum].flatten()
+        weightedSubgraphs_NetShape[:,:,subGraphNum] = thisGraph_NetShape.copy()
+
+    FC_All_Reconstituted = np.matmul(weightedSubgraphs,subgraphExpressions)
+    
+    return weightedSubgraphs, subgraphExpressions, weightedSubgraphs_NetShape, FC_All_Reconstituted
