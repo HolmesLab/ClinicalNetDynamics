@@ -16,7 +16,11 @@ To investigate brain network dynamics linked with dimensionally-based symptom pr
   
 * Data_Splitting_Cocuzza.py: python script on how we split data into train/test/validation to avoid data leakage (see manuscript Methods)
   
-* Heatmap_NetColors_Cocuzza.py: python function to visualize network color labels on x/y axes of functional connectivity matrices 
+* Heatmap_NetColors_Cocuzza.py: python function to visualize network color labels on x/y axes of functional connectivity matrices
+  
+* .Rmd scripts: RStudio scripts that are helpful for some functions inside Fingerprints_Cocuzza.py. See usage notes in Fingerprints_Cocuzza.py for details. Note that these R scripts require adaptation to your machine (e.g., directories, etc.) and research study (e.g., dataset specifications).
+  
+* .npy, .csv, and .pkl files. These are helper files for running functions in Fingerprints_Cocuzza.py (see usage notes in that script). These are fully de-identified and can be reconstituted by openly available Transdiagnostic Connectome Project data (see below for links to OpenNeuro and NDA). 
 
 **Outside resources relevant to manuscript:**
 * Transdiagnostic Connectome Project data via [OpenNeuro](https://openneuro.org/datasets/ds005237) and [NIMH Data Archive](https://nda.nih.gov/study.html?id=2932)
