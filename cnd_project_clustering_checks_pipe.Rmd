@@ -1,0 +1,95 @@
+---
+Author: Carrisa V. Cocuzza, PhD 
+Purpose: CND project, TCP dataset, Train/Test subset, dimensional phenotyping, hierarchical clustering checks. 
+Output: html_notebook
+---
+```{r}
+#install.packages("NbClust")
+```
+
+```{r}
+# LIBRARIES 
+library(dplyr)
+library(bestNormalize)
+library(parallel)
+library(tibble)
+library(tidyr)
+library(Hmisc)
+packages <- c("here", "psych", "NbClust", "igraph", "qgraph")
+lapply(packages, require, character.only = T)
+```
+
+
+```{r}
+# LOAD DATA. NOTE: CHANGE TO YOUR DIRECTORY. 
+dirHere <- "/gpfs/milgram/project/holmes/cvc23/ClinicalNetDynamics/data/results/misc_results_CND/"
+#fileHere <- paste(dirHere,"dataHere_Imputed_TrainTest.csv",sep="")
+fileHere <- paste(dirHere,"dataHere_Imputed_TrainTest_select.csv",sep="")
+
+dataHere <- read.csv(fileHere)
+class(dataHere)
+nMetricsHere <- ncol(dataHere)
+nSubjsHere <- nrow(dataHere)
+print(paste("There are",nSubjsHere,"subjects and",nMetricsHere-2,"scales."))
+```
+
+
+```{r}
+# Individual differences correlations between all measures 
+dataHere_Matrix <- as.matrix(dataHere[,3:nMetricsHere])
+#indivCorrs <- rcorr(dataHere_Matrix,type="spearman")
+indivCorrs <- cor(dataHere_Matrix,method="spearman")
+```
+
+
+```{r}
+# Clustering: checking that it works
+nClusters <- 4
+h <- hclust(as.dist(1-indivCorrs),method="ward.D2")
+clusters <- cutree(h,nClusters)
+print(clusters)
+```
+
+
+```{r}
+# nbclust: find ideal clusters 
+
+# "NbClust" criteria, to select number of clusters:
+nom_methode =  c("kl", "ch", "hartigan", "cindex", "db", "silhouette",
+                 "ratkowsky", "ball", "ptbiserial", "gap", "frey", "mcclain",
+                 "gamma", "gplus", "dunn", "sdindex", "sdbw",
+                 "tau")
+
+# NOTE: other indices: 
+# "ccc", "scott", "marriot", "trcovw", "tracew", "friedman", "rubin" -->  (cannot handle NaN/NULL)
+# "duda", "pseudot2", "beale" -- > (for some reason cannot find best (best.nc object))
+# "hubert", "dindex" -- (throws error "replacement has length zero")
+
+nbPartition = rep(NaN, length(nom_methode))
+
+for (i in 1:length(nom_methode)){
+  nbPartition[i] = NbClust(indivCorrs, 
+                           diss = as.dist(((1-indivCorrs)),
+                                          diag = FALSE),
+                           distance = NULL,
+                           min.nc = 4,
+                           max.nc = 6,
+                           method="ward.D2",
+                           index = nom_methode[i])$Best.nc[1]
+  print(paste("Number of Clusters: ", nbPartition[i]," (criteria: ", 
+              nom_methode[i], ")", sep=""))
+}
+nb_cluster_table = table(nbPartition)
+nb_cluster = as.integer(names(nb_cluster_table[which.max(nb_cluster_table)]))
+print(paste("Number of clusters chosen = ",nb_cluster,sep=""))
+
+```
+
+```{r}
+# Perform clustering with chosen number of clusters from above 
+nClusters <- nb_cluster
+h <- hclust(as.dist(1-indivCorrs),method="ward.D2")
+clusters <- cutree(h,nClusters)
+which(clusters==1)
+```
+

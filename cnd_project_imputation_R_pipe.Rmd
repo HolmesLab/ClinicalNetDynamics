@@ -1,0 +1,189 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+```{r}
+# INSTALLS 
+#install.packages("bestNormalize")
+```
+
+```{r}
+# LIBRARIES 
+library(dplyr)
+library(bestNormalize)
+library(parallel)
+```
+
+```{r}
+# LOAD DATA. NOTE: CHANGE TO YOUR DIRECTORY.
+dirHere <- "/gpfs/milgram/project/holmes/cvc23/ClinicalNetDynamics/data/results/misc_results_CND/"
+
+#fileHere <- paste(dirHere,"dataHere_CND_Z_trim.csv",sep="")
+#fileHere <- paste(dirHere,"dataHere_CND_ToTransform.csv",sep="")
+
+#fileHere <- paste(dirHere,"dataHere_TrimFinal_Normed_MinMax_ToTransform.csv",sep="")
+#fileHere <- paste(dirHere,"dataHere_TrimFinal_Normed_Z_ToTransform.csv",sep="")
+fileHere <- paste(dirHere,"dataHere_TrimFinal_NotNormed_ToTransform.csv",sep="")
+
+dataHere <- read.csv(fileHere) # z-scored and trimmed 
+class(dataHere)
+nMetricsHere <- ncol(dataHere)
+nSubjsHere <- nrow(dataHere)
+print(paste("There are",nSubjsHere,"subjects and",nMetricsHere-2,"scales."))
+```
+
+
+```{r}
+# Use bestNormalize: debugging with 1 example measure 
+
+keyIx = 3 # change me 
+keysHere <- colnames(dataHere) # NOTE: start at index 2, I think this b/c the 1st index is like a blank corner? 
+
+keyToUse <- keysHere[keyIx]
+print(paste("Inspecting: ",keyToUse))
+
+dataVec <- pull(select(dataHere,keyToUse))
+hist(dataVec)
+
+(bestNormObject <- bestNormalize(dataVec))
+
+boxplot(log10(bestNormObject$oos_preds), yaxt = 'n')
+axis(2, at=log10(c(.1,.5, 1, 2, 5, 10)), labels=c(.1,.5, 1, 2, 5, 10))
+
+plot(bestNormObject, leg_loc = "bottomright")
+```
+```{r}
+# Initialize empty dataframe for transformed vars
+dataHere_TransformNames <- data.frame(matrix("                    ", 1, nMetricsHere)) 
+colnames(dataHere_TransformNames) <- colnames(dataHere)
+
+transformHere <- bestNormObject$chosen_transform
+print(transformHere)
+
+#dataHere_TransformNames[keyToUse] <- transformHere
+#dataHere_TransformNames
+
+dirHere <- "/gpfs/milgram/project/holmes/cvc23/ClinicalNetDynamics/data/results/misc_results_CND/"
+fileHere <- paste(dirHere,keyToUse,"_bestTransformInfo.txt",sep="")
+
+#lapply(transformHere,write,fileHere,append=TRUE,ncolumns=1000)
+capture.output(transformHere,file = fileHere)
+```
+
+```{r}
+metricIx <- 47
+bestNormObject <- bestNormalize(dataHere[,metricIx],loo = T)$chosen_transform$x.t
+hist(dataHere[,metricIx])
+hist(bestNormObject)
+```
+
+```{r}
+dataHere[,metricIx]
+```
+
+```{r}
+# Use bestNormalize: debugging with 1 example measure, CONTINUED
+
+(dataVec_YeoJohnson <- yeojohnson(dataVec))
+dataVec_YeoJohnson_Pred <- predict(dataVec_YeoJohnson)
+dataVec_YeoJohnson_Pred2 <- predict(dataVec_YeoJohnson, newdata=dataVec_YeoJohnson_Pred,inverse=TRUE)
+print(all.equal(dataVec,dataVec_YeoJohnson_Pred2))
+hist(dataVec_YeoJohnson_Pred)
+hist(dataVec_YeoJohnson_Pred2)
+hist(dataVec)
+
+
+```
+
+```{r}
+keysHere <- colnames(dataHere) # NOTE: start at index 2, I think this b/c the 1st index is like a blank corner? 
+print(keysHere)
+
+```
+
+
+```{r}
+# Run bestNormalize on all variables; using multi-threading to help
+dirHere <- "/gpfs/milgram/project/holmes/cvc23/ClinicalNetDynamics/data/results/misc_results_CND/"
+
+# Initialize empty dataframe for transformed vars
+dataHere_Trans <- data.frame(matrix(NA, nSubjsHere, nMetricsHere)) 
+
+# Add scale names back into column headers and add subject ID column back to location #2 
+dataHere_Trans[,1] <- dataHere[,1] # original indices of subjects ("X" column)
+dataHere_Trans[,2] <- dataHere[,2] # subject IDs 
+colnames(dataHere_Trans) <- colnames(dataHere)
+keysHere <- colnames(dataHere) # NOTE: start at index 2, I think this b/c the 1st index is like a blank corner? 
+
+cl <- makeCluster(10)
+
+#for (metricIx in 3:nMetricsHere){
+for (metricIx in 40:nMetricsHere){
+  dataHere_Trans[,metricIx] <- bestNormalize(dataHere[,metricIx],loo = T, cluster = cl)$chosen_transform$x.t
+  
+  # Save the transform that was chosen to a txt file 
+  keyToUse <- keysHere[metricIx]
+  #dataVec <- pull(select(dataHere,keyToUse))
+  dataVec <- dataHere[,metricIx]
+  (bestNormObject <- bestNormalize(dataVec))
+  transformHere <- bestNormObject$chosen_transform
+  fileHere <- paste(dirHere,keyToUse,"_NotNormed_bestTransformInfo.txt",sep="") # ***** CHANGE ME *****
+  capture.output(transformHere,file = fileHere)
+}
+
+```
+
+
+```{r}
+keyToUse <- keysHere[metricIx]
+```
+
+
+```{r}
+dataVec <- pull(select(dataHere,keyToUse))
+
+(bestNormObject <- bestNormalize(dataVec))
+```
+
+```{r}
+# Run bestNormalize on all variables; using multi-threading to help
+dirHere <- "/gpfs/milgram/project/holmes/cvc23/ClinicalNetDynamics/data/results/misc_results_CND/"
+
+# Initialize empty dataframe for transformed vars
+dataHere_Trans <- data.frame(matrix(NA, nSubjsHere, nMetricsHere)) 
+
+# Add scale names back into column headers and add subject ID column back to location #2 
+dataHere_Trans[,1] <- dataHere[,1] # original indices of subjects ("X" column)
+dataHere_Trans[,2] <- dataHere[,2] # subject IDs 
+colnames(dataHere_Trans) <- colnames(dataHere)
+keysHere <- colnames(dataHere) # NOTE: start at index 2, I think this b/c the 1st index is like a blank corner? 
+
+cl <- makeCluster(10)
+
+for (metricIx in 3:nMetricsHere){
+  dataHere_Trans[,metricIx] <- bestNormalize(dataHere[,metricIx],loo = T, cluster = cl)$chosen_transform$x.t
+}
+
+```
+
+```{r}
+# Save dataframe to bring back to jupyter notebook 
+dirHere <- "/gpfs/milgram/project/holmes/cvc23/ClinicalNetDynamics/data/results/misc_results_CND/"
+
+#fileHere <- paste(dirHere,"dataHere_CND_Transformed.csv",sep="")
+
+#fileHere <- paste(dirHere,"dataHere_TrimFinal_Normed_MinMax_Transformed.csv",sep="")
+#fileHere <- paste(dirHere,"dataHere_TrimFinal_Normed_Z_Transformed.csv",sep="")
+fileHere <- paste(dirHere,"dataHere_TrimFinal_NotNormed_Transformed.csv",sep="")
+
+write.csv(dataHere_Trans,fileHere)
+```
+
+
+
